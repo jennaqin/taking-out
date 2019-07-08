@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.keshe.luntan.dao.OrderDao">
+
+    <sql id="allField">
+        tor.orderid,tor.orderid,tor.tradingtime,tor.orderstate,tor.totalprice
+    </sql>
+
+    <insert id="addOrder" useGeneratedKeys="true" keyProperty="orderid" parameterType="com.keshe.luntan.entity.Order">
+        INSERT INTO table_order VALUES(NULL,#{userid},#{tradingtime},#{orderstate},#{totalprice})
+    </insert>
+
+    <select id="getOrderById" parameterType="int" resultType="com.keshe.luntan.entity.Ext_Order">
+        SELECT
+        <include refid="allField"></include>
+        ,tu.name username,tu.icon usericon
+        FROM table_order tor, table_user tu
+        WHERE tor.userid = tu.uerid AND tor.orderid=#{orderid}
+    </select>
+
+    <select id="getOrderMsg" resultType="com.keshe.luntan.entity.Ext_Order">
+        SELECT
+        <include refid="allField"></include>
+        ,tu.name username,tu.icon usericon
+        FROM table_order tor, table_user tu
+        WHERE tor.userid = tu.userid AND tor.orderid=#{param1} AND tor.userid = #{param2}
+    </select>
+
+    <update id="updateOrder" parameterType="com.keshe.luntan.entity.Order">
+        UPDATE table_order tor
+        SET
+        tor.userid = #{userid},
+        tor.tradingtime = #{tradingtime},
+        tor.orderstate = #{orderstate},
+        tor.totalprice = #{totalprice},
+        WHERE tor.orderid = #{orderid}
+    </update>
+
+    <update id="updateOrderState">
+        UPDATE table_order tor SET
+        tor.orderstate = #{param2}
+        WHERE tor.orderid = #{param1}
+    </update>
+
+    <select id="getOrderCount" parameterType="com.keshe.luntan.entity.Order" resultType="int">
+        SELECT COUNT(tor.orderid) FROM table_order tor
+        <where>
+            <if test="userid != 0">
+                AND tor.userid = #{uerid}
+            </if>
+            <if test="orderstate != 0">
+                AND tor.orderstate = #{orderstate}
+            </if>
+        </where>
+    </select>
+
+    <select id="getOrderList" parameterType="com.keshe.luntan.entity.Paging" resultType="com.keshe.luntan.entity.Ext_Order">
+        SELECT
+        <include refid="allField"></include>
+        ,tu.name username,tu.icon usericon
+        FROM table_order tor, table_user tu
+        WHERE tor.userid = tu.userid
+        <if test="pojo.userid != 0">
+            AND tor.userid = #{pojo.uerid}
+        </if>
+        <if test="pojo.orderstate != 0">
+            AND tor.orderstate = #{pojo.orderstate}
+        </if>
+        ORDER BY
+        <if test="pojo.totalprice != 0.0">
+            tor.totalprice
+        </if>
+        <if test="pojo.totalprice == 0.0">
+            tor.tradingtime
+        </if>
+        <if test="order != 0">
+            DESC
+        </if>
+        LIMIT #{currentpage}, #{numbers}
+    </select>
+
+</mapper>

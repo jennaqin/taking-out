@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.keshe.luntan.dao.MealDao">
+
+    <sql id="allField">
+        tm.mealid,tm.typeid,tm.mealname,tm.mealprice,tm.mealphoto,tm.mealstate
+    </sql>
+
+    <insert id="addMeal" useGeneratedKeys="true" keyProperty="mealid" parameterType="com.keshe.luntan.entity.Meal">
+        INSERT INTO table_meal VALUES(NULL,#{typeid},#{mealname},#{mealprice},#{mealphoto},#{mealstate})
+    </insert>
+
+    <select id="getMealMsg" parameterType="int" resultType="com.keshe.luntan.entity.Meal">
+        SELECT
+        <include refid="allField"></include>
+        ,tmm.mealdescription mealdescription
+        FROM table_meal tm, table_mealMsg tmm
+        WHERE tm.mealid = tmm.mealid AND tm.mealid = #{mealid}
+    </select>
+
+
+    <update id="updateMeal" parameterType="com.keshe.luntan.entity.Meal">
+        UPDATE table_meal tm
+        SET
+        tm.typeid = #{typeid},
+        tm.mealname = #{mealname},
+        tm.mealprice = #{mealprice},
+        tm.mealphoto = #{mealphoto},
+        tm.mealstate = #{mealstate},
+        WHERE tm.mealid = #{mealid}
+    </update>
+
+    <update id="updateMealState">
+        UPDATE table_meal tm SET
+        tm.mealstate = #{param2}
+        WHERE tm.mealid = #{param1}
+    </update>
+
+    <select id="getMealCount" parameterType="com.keshe.luntan.entity.Meal" resultType="int">
+        SELECT COUNT(tm.mealid) FROM table_meal tm
+        <where>
+            <if test="typeid != 0">
+                AND tm.typeid = #{typeid}
+            </if>
+            <if test="mealstate != 0">
+                AND tm.mealstate = #{mealstate}
+            </if>
+            <if test="mealname != null">
+                AND tm.mealstate = '%${mealstate}%'
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getMealList" parameterType="com.keshe.luntan.entity.Paging"
+            resultType="com.keshe.luntan.entity.Ext_Meal">
+        SELECT
+        <include refid="allField"></include>
+        ,tmt.typename
+        FROM table_meal tm, table_mealtype tmt
+        WHERE tm.typeid = tmt.typeid
+        <if test="pojo.typeid != 0">
+            AND tm.typeid = #{typeid}
+        </if>
+        <if test="pojo.mealstate != 0">
+            AND tm.mealstate = #{pojo.mealstate}
+        </if>
+        <if test="pojo.mealname != null">
+            AND tm.mealstate = '%${pojo.mealstate}%'
+        </if>
+        ORDER BY tm.mealid
+        <if test="order != 0">
+            DESC
+        </if>
+        LIMIT #{currentpage}, #{numbers}
+    </select>
+
+    <update id="updateMealPrice">
+        UPDATE table_meal tm SET tm.mealprice = #{param2} WHERE tm.mealid = #{param1}
+    </update>
+    <update id="updateMealPhoto">
+        UPDATE table_meal tm SET tm.mealphoto = #{param2} WHERE tm.mealid = #{param1}
+    </update>
+
+</mapper>

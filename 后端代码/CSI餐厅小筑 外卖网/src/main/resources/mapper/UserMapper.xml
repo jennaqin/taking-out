@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.keshe.luntan.dao.UserDao" >
+
+    <sql id="allField">
+        tu.userid,tu.name,tu.icon,tu.state,tu.address
+    </sql>
+
+    <select id="login" resultType="com.keshe.luntan.entity.User">
+        SELECT
+        <include refid="allField"></include>
+        FROM table_user tu
+        WHERE tu.userphone=#{param1} AND BINARY tu.password=#{param2}
+    </select>
+
+    <insert id="addUser" useGeneratedKeys="true" keyProperty="userid" parameterType="com.keshe.luntan.entity.User" >
+        INSERT INTO table_user VALUES(NULL,#{userphone},#{password},#{address},#{name},#{icon},#{state})
+    </insert>
+
+    <select id="getUserByID" parameterType="int" resultType="com.keshe.luntan.entity.User">
+        SELECT
+        <include refid="allField"></include>
+        FROM table_user tu WHERE tu.userid=#{userid}
+    </select>
+
+    <select id="getUserByPhone" parameterType="String" resultType="com.keshe.luntan.entity.User">
+        SELECT
+        <include refid="allField"></include>
+        FROM table_user tu WHERE tu.userphone=#{userphone}
+    </select>
+
+    <update id="updateUser" parameterType="com.keshe.luntan.entity.User" >
+        UPDATE table_user tu
+        SET
+        tu.userphone = #{userphone},
+        tu.name = #{name},
+        tu.password = #{password},
+        tu.address = #{address},
+        tu.icon = #{icon},
+        tu.state = #{state}
+        WHERE tu.userid = #{userid}
+    </update>
+
+    <update id="updateIcon" >
+        UPDATE table_user tu SET
+        tu.icon = #{param2}
+        WHERE tu.userid = #{param1}
+    </update>
+
+    <update id="updateState" >
+        UPDATE table_user tu SET
+        tu.state = #{param2}
+        WHERE tu.userid = #{param1}
+    </update>
+
+    <update id="updatePhone" >
+        UPDATE table_user tu SET
+        tu.phone = #{param2}
+        WHERE tu.userid = #{param1}
+    </update>
+
+    <update id="updateUserMsg" >
+        UPDATE table_user tu SET
+        tu.name = #{param2},
+        tu.address = #{param3}
+        WHERE tu.userid = #{param1}
+    </update>
+
+    <update id="updatePasswordById" >
+        UPDATE table_user tu SET
+        tu.password = #{param2}
+        WHERE tu.userid = #{param1}
+    </update>
+
+    <update id="updatePasswordByPhone" >
+        UPDATE table_user tu SET
+        tu.password = #{param2}
+        WHERE tu.userphone = #{param1}
+    </update>
+
+    <select id="checkPassword" resultType="int">
+        SELECT COUNT(tu.userid) FROM table_user tu WHERE tu.userid = #{param1} AND tu.password = #{param2}
+    </select>
+
+    <select id="getUserCount" parameterType="int" resultType="int">
+        SELECT COUNT(tu.userid) FROM table_user tu
+            WHERE tu.state = #{state}
+
+    </select>
+
+    <select id="getUsers" parameterType="com.keshe.luntan.entity.Paging" resultType="com.keshe.luntan.entity.User">
+        SELECT
+        <include refid="allField"></include>
+        FROM table_user tu
+        WHERE tu.state = #{pojo}
+        LIMIT #{currentpage},#{numbers}
+    </select>
+
+</mapper>

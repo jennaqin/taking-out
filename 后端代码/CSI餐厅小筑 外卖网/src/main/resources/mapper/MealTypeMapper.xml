@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.keshe.luntan.dao.MealTypeDao">
+
+    <insert id="addMealType" parameterType="String">
+        INSERT INTO table_mealtype VALUES(null,#{typename})
+    </insert>
+
+    <update id="updateMealType" parameterType="com.keshe.luntan.entity.MealType">
+        UPDATE table_mealtype tgt SET tgt.typename = #{param2} WHERE tgt.typeid = #{param1}
+    </update>
+
+    <select id="getMealTypeList" resultType="com.keshe.luntan.entity.MealType">
+        SELECT tmt.typeid,tmt.typename FROM table_mealtype tmt ORDER BY tmt.typeid
+    </select>
+
+    <select id="getMealTypeCount" resultType="int">
+        SELECT COUNT(tmt.typeid) FROM table_mealtype tmt
+    </select>
+
+</mapper>

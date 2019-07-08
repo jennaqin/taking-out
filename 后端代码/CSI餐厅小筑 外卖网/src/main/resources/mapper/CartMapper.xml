@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.keshe.luntan.dao.CartDao">
+
+    <sql id="allField">
+        tc.cartid,tc.userid,tc.mealid,tc.orderid,tc.count
+    </sql>
+
+    <insert id="addCart" useGeneratedKeys="true" keyProperty="orderid" parameterType="com.keshe.luntan.entity.Cart">
+        INSERT INTO table_cart VALUES(NULL,#{userid},#{mealid},#{orderid},#{count})
+    </insert>
+
+    <select id="getCartMsg" parameterType="int" resultType="com.keshe.luntan.entity.Ext_Cart">
+        SELECT
+        <include refid="allField"></include>
+        ,tm.mealname, tm.mealprice, tm.mealphoto
+        FROM table_cart tc, table_meal tm
+        WHERE tc.mealid = tm.mealid AND tc.cartid = #{cartid}
+    </select>
+
+    <select id="getMealCount"  resultType="Integer">
+        SELECT tc.count
+        FROM table_cart tc
+        WHERE tc.userid = #{param1} AND tc.mealid = #{param2} AND tc.orderid = 0
+    </select>
+
+    <select id="getTatalPrice"  resultType="double">
+        SELECT SUM(tc.count*tm.mealprice) FROM table_meal tm, table_cart tc
+        WHERE tc.mealid = tm.mealid AND tc.cartid IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updateCountByUseridAndMealid" >
+        UPDATE table_cart tc
+        SET
+        tc.count = #{param3}
+        WHERE tc.userid = #{param1} AND tc.mealid = #{param2} AND tc.orderid = 0
+    </update>
+
+    <update id="updateCart" parameterType="com.keshe.luntan.entity.Cart">
+        UPDATE table_cart tc
+        SET
+        tc.userid = #{userid},
+        tc.mealid = #{mealid},
+        tc.orderid = #{orderid},
+        tc.count = #{count},
+        WHERE tc.cartid = #{cartid}
+    </update>
+
+    <update id="updateOrderid" >
+        UPDATE table_cart tc SET
+        tc.orderid = #{param1}
+        WHERE tc.cartid IN
+        <foreach collection="param2" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getCartCount" parameterType="com.keshe.luntan.entity.Cart" resultType="int">
+        SELECT COUNT(tc.cartid) FROM table_cart tc
+        <where>
+            <if test="userid != 0">
+                AND tc.userid = #{userid}
+            </if>
+            <if test="mealid != 0">
+                AND tc.mealid = #{mealid}
+            </if>
+            <if test="orderid != 0">
+                AND tc.orderid = #{orderid}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getCartList" parameterType="com.keshe.luntan.entity.Paging" resultType="com.keshe.luntan.entity.Ext_Cart">
+        SELECT
+        <include refid="allField"></include>
+        ,tm.mealname, tm.mealprice, tm.mealphoto
+        FROM table_cart tc, table_meal tm
+        WHERE tc.mealid = tm.mealid
+        <if test="pojo.userid != 0">
+            AND tc.userid = #{pojo.userid}
+        </if>
+        <if test="pojo.mealid != 0">
+            AND tc.mealid = #{pojo.mealid}
+        </if>
+        <if test="pojo.orderid != 0">
+            AND tc.orderid = #{pojo.orderid}
+        </if>
+        <if test="pojo.orderid == 0">
+            AND tc.orderid = 0
+        </if>
+        LIMIT #{currentpage}, #{numbers}
+    </select>
+
+    <select id="getTotalMoney" parameterType="int[]" resultType="double">
+        SELECT SUM(tm.mealprice) FROM table_meal tm, table_cart tc
+        WHERE tc.mealid = tm.mealid AND
+        <foreach collection="cartidArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <delete id="deleteCart" parameterType="int">
+        DELETE FROM table_cart WHERE cartid = #{cartid} AND orderid = 0;
+    </delete>
+</mapper>

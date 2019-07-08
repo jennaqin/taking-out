@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CSI餐厅小筑 外卖网</title>
+    <link href="../assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/plugins/footable/css/footable.core.css" rel="stylesheet">
+    <link href="../assets/plugins/bootstrap-select/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/colors/blue.css" id="theme" rel="stylesheet">
+    <!-- react -->
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <script src="../build/babel.min.js"></script>
+    <!-- 配置文件 -->
+    <script src="../config.js"></script>
+</head>
+
+<body class="fix-header card-no-border logo-center">
+    <div class="preloader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" /> </svg>
+    </div>
+    <div id="main-wrapper">
+        <header class="topbar">
+            <nav class="navbar top-navbar navbar-expand-md navbar-light">
+                <div class="navbar-collapse">
+                    <div class="navbar-nav mr-auto mt-md-0">
+                        <div class="nav-item"> <a class="navbar-brand" href="user.html"><img
+                                    src="../assets/images/logo.png" class="light-logo" alt="homepage" /></a> </div>
+                    </div>
+                    <ul class="navbar-nav my-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img
+                                    src="../assets/images/users/1.jpg" alt="user" class="profile-pic" /></a>
+                            <div class="dropdown-menu dropdown-menu-right scale-up">
+                                <ul class="dropdown-user">
+                                    <li>
+                                        <div class="dw-user-box">
+                                            <div class="u-img"><img src="../assets/images/users/1.jpg" alt="user"></div>
+                                            <div class="u-text">
+                                                <h4>Steave Jobs</h4>
+                                                <a href="user-setting.html"
+                                                    class="btn btn-rounded btn-danger btn-sm">个人设置</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="change_password.html"><i class="ti-user"></i>修改密码</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#"><i class=" ti-shopping-cart"></i>我的购物车</a></li>
+                                    <li><a href="user-order-list.html"><i class="ti-receipt"></i> 我的订单</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="login.html"><i class="fa fa-power-off"></i>退出登录</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <aside class="left-sidebar">
+            <div class="scroll-sidebar">
+                <nav class="sidebar-nav">
+                    <ul id="sidebarnav">
+                        <li> <a class="has-arrow waves-effect waves-dark" href="menu.html" aria-expanded="false"><i
+                                    class="mdi mdi-book-open-variant"></i><span class="hide-menu">菜单</span></a>
+                        </li>
+                        <li class="three-column"> <a class="has-arrow waves-effect waves-dark" href="#"
+                                aria-expanded="false"><i class="mdi mdi-clipboard-text"></i><span
+                                    class="hide-menu">我的购物车</span></a>
+                        </li>
+                        <li class="two-column"> <a class="has-arrow waves-effect waves-dark" href="user-order-list.html"
+                                aria-expanded="false"><i class="mdi mdi-cart-outline"></i><span
+                                    class="hide-menu">我的订单</span></a>
+                        </li>
+                        <li class="two-column"> <a class="has-arrow waves-effect waves-dark" href="user-setting.html"
+                                aria-expanded="false"><i class="mdi mdi-settings"></i><span
+                                    class="hide-menu">个人设置</span></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <div class="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+
+                          <!-- react组件 -->
+                            <div class="table-responsive" id="cartList">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+    </div>
+    <script src="../assets/plugins/jquery/jquery.min.js"></script>
+    <script src="../assets/plugins/bootstrap/js/popper.min.js"></script>
+    <script src="../assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/jquery.slimscroll.js"></script>
+    <script src="js/waves.js"></script>
+    <script src="js/sidebarmenu.js"></script>
+    <script src="../assets/plugins/sticky-kit-master/dist/sticky-kit.min.js"></script>
+    <script src="../assets/plugins/sparkline/jquery.sparkline.min.js"></script>
+    <script src="js/custom.min.js"></script>
+    <script src="../assets/plugins/footable/js/footable.all.min.js"></script>
+    <script src="../assets/plugins/bootstrap-select/bootstrap-select.min.js" type="text/javascript"></script>
+    <script src="js/footable-init.js"></script>
+    <script src="../assets/plugins/styleswitcher/jQuery.style.switcher.js"></script>
+    <script type="text/babel">
+      class CartList extends React.Component { 
+        constructor(props) {
+          super(props)
+          this.state = {
+            carts: []
+          }
+          this.addOrder = this.addOrder.bind(this)
+        }
+        deleteCart(id, event) {
+          console.log('删除！！！', id)
+          let that = this
+          // 删除购物车记录
+          $.ajax({
+            type: 'POST',
+            url: global.targetUrl + 'user/deletecart',
+            headers: {
+              token: localStorage.token 
+            },
+            data: {
+              'cartid': id
+            },
+            success: function (res) {
+              console.log('返回的',res)
+              if (res.resultMsg.code === 1000) {
+                that.componentDidMount()
+              }
+            }
+          })
+        }
+        addOrder() {
+          console.log('下单！！！')
+          let that = this
+          let cartsList = []
+          for(let i = 0; i < this.state.carts.length; i++) {
+            cartsList.push(this.state.carts[i].cartid)
+          }
+          console.log(cartsList)
+          // 下单
+          $.ajax({
+            type: 'POST',
+            traditional: true,
+            url: global.targetUrl + 'user/addorder',
+            headers: {
+              token: localStorage.token 
+            },
+            data: {
+              'cartIdList': cartsList
+            },
+            success: function (res) {
+              console.log('返回的',res)
+              if (res.resultMsg.code === 1000) {
+                alert('下单成功')
+                location.href = "user-order-list.html"
+              }
+            }
+          })
+        }
+        componentDidMount() {
+          let that = this
+          // 获取购物车列表
+          $.ajax({
+            type: 'POST',
+            url: global.targetUrl + 'user/getcartlist',
+            headers: {
+              token: localStorage.token 
+            },
+            data: {
+              'currentpage': 0
+            },
+            success: function (res) {
+              console.log('返回的',res)
+              if (res.resultMsg.code === 1000) {
+                that.setState({
+                  carts: res.bean.pojo
+                })
+              }
+            }
+          })
+        }
+        render() {
+          return (
+            <div>
+              <table id="demo-foo-addrow" className="table m-t-30 table-hover contact-list"
+                  data-page-size="10">
+                  <thead>
+                      <tr>
+                          <th>编号</th>
+                          <th>菜名</th>
+                          <th>单价</th>
+                          <th>数量</th>
+                          <th>删除</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {
+                        this.state.carts.map(item => {
+                          return(
+                            <tr key={item.cartid}>
+                                <td>{item.cartid}</td>
+                                <td>{item.mealname}</td>
+                                <td>{item.mealprice}</td>
+                                <td>{item.count}</td>
+                                <td>
+                                    <button type="button" className="btn btn-sm btn-icon btn-pure btn-outline" 
+                                    onClick={this.deleteCart.bind(this, item.cartid)}> <i className="ti-close"></i></button>
+                                </td>
+                            </tr>
+                          )}
+                        )
+                      }
+                  </tbody>
+                  <tfoot>
+                  </tfoot>
+              </table>
+              <div className="form-group">
+                  <center><button onClick={this.addOrder} className="btn btn-success">下单</button></center>
+              </div>
+            </div>
+          )
+        }
+      }
+      ReactDOM.render (
+        <CartList />,
+        document.getElementById('cartList')
+      )
+
+    </script>
+</body>
+
+</html>
